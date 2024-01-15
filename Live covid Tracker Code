@@ -1,0 +1,68 @@
+//Live Covid Tracker code
+from tkinter import *
+from matplotlib import pyplot as plt
+import matplotlib.patches as mpatches
+from covid import Covid
+
+def covid_data():
+    try:
+        covid = Covid()
+        data = StringVar()
+        countries = data.get()
+        country_names = countries.strip()
+        country_names = country_names.replace(" ", ",")
+        country_names = country_names.split(",")
+
+        cases = []
+        confirmed = []
+        deaths = []
+        recovered = []
+        active = []
+
+        for x in country_names:
+            cases.append(covid.get_status_by_country_name(x))
+
+        for y in cases:
+            confirmed.append(y["confirmed"])
+            deaths.append(y["deaths"])
+            recovered.append(y["recovered"])
+            active.append(y["active"])
+
+        plt.figure(figsize=(10, 6))
+
+        for i in range(len(country_names)):
+            plt.bar(country_names[i], confirmed[i], color='blue', label='Confirmed')
+            plt.bar(country_names[i], recovered[i], color='green', label='Recovered')
+            plt.bar(country_names[i], active[i], color='red', label='Active')
+            plt.bar(country_names[i], deaths[i], color='black', label='Deaths')
+
+        plt.title('CURRENT COVID CASES')
+        plt.xlabel('COUNTRY NAME')
+        plt.ylabel('CASES(in millions)')
+        plt.legend()
+        plt.show()
+
+    except Exception as e:
+        data.set("Enter the correct details please:")
+        Label(root, text="COVID-19 UPDATES\nEnter the countries names\nfor whom you want to get "
+                         "the\ncovid-19 data", font="LUCIDA 15 bold").pack()
+        Label(root, text="Enter the Country Names", font="bold").pack()
+        data = StringVar()
+        data.set("Separate Country Names using a comma or space (not both)")
+        entry = Entry(root, textvariable=data, width=50).pack()
+        Button(root, text="Get Data", command=covid_data).pack()
+
+if __name__ == "__main__":
+    root = Tk()
+    root.geometry("600x600")
+    root.title("CovidInfo")
+
+    Label(root, text="COVID-19 UPDATES\nEnter the countries names\nfor whom you want to get "
+                     "the\ncovid-19 data", font="LUCIDA 15 bold").pack()
+    Label(root, text="Enter the Country Names", font="bold").pack()
+    data = StringVar()
+    data.set("Separate Country Names using a comma or space (not both)")
+    entry = Entry(root, textvariable=data, width=50).pack()
+    Button(root, text="Get Data", command=covid_data).pack()
+
+    root.mainloop()
